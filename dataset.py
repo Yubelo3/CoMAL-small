@@ -29,6 +29,7 @@ class PubMedDataset(Dataset):
         self.multi_hot=dataframe.iloc[:,-14:].values
 
     def __len__(self):
+        return 100
         return len(self.pmid)
 
     def __getitem__(self, index):

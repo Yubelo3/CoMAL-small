@@ -14,7 +14,6 @@ class BertEncoder(nn.Module):
 
     def forward(self, text: str):
         encoded_input = self.tokenizer(
-            text, return_tensors='pt', padding=True).to(self.device)
+            text, return_tensors='pt', padding=True, truncation=True).to(self.device)
         output = self.model(**encoded_input)
         return output["pooler_output"]
-
