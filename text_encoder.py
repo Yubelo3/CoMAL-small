@@ -9,8 +9,8 @@ class BertEncoder(nn.Module):
         self.tokenizer: BertTokenizer = BertTokenizer.from_pretrained(
             'bert-base-uncased', cache_dir="cached")
         self.model: BertModel = BertModel.from_pretrained(
-            "bert-base-uncased", cache_dir="cached").to("cuda")
-        self.model = self.model.to(device)
+            "bert-base-uncased", cache_dir="cached").to(device)
+        self.model = self.model
 
     def forward(self, text: str):
         encoded_input = self.tokenizer(

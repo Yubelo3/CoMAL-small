@@ -1,3 +1,5 @@
 /cached
 /__pycache__
 /data
+/ckpt
+/logs
