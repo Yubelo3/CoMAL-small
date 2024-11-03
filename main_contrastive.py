@@ -1,3 +1,9 @@
+import random 
+import torch
+import numpy
+random.seed(2024)
+torch.manual_seed(2024)
+numpy.random.seed(2024)
 from dataset import load_dataset
 from text_encoder import BertEncoder
 from torch.utils.data import DataLoader
@@ -5,14 +11,12 @@ from classifier import MLPClassifier
 from auto_encoder import AutoEncoder
 from tqdm import tqdm
 import torch
-from torch.utils.tensorboard.writer import SummaryWriter
-import torch.optim.lr_scheduler as lr_scheduler
 from metric import topk_precision
 from logger import TBWriter
 
 device = "cuda"
 
-train_set, test_set = load_dataset(initial_train_size=1000)
+train_set, test_set = load_dataset(initial_train_size=1000, test_size=500)
 train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
 
 model = {
@@ -23,7 +27,7 @@ model = {
 for v in model.values():
     v = torch.compile(v)
 optimizer = {
-    "text_encoder": torch.optim.Adam(model["text_encoder"].parameters(), lr=1e-4),
+    "text_encoder": torch.optim.Adam(model["text_encoder"].parameters(), lr=1e-6),
     "auto_encoder": torch.optim.Adam(model["auto_encoder"].parameters(), lr=0.004, betas=(0.9, 0.999)),
     "classifier": torch.optim.Adam(model["classifer"].parameters(), lr=0.004, betas=(0.9, 0.999))
 }
@@ -48,7 +52,7 @@ def train_loop():
             txt_emb, multi_hot)
         contra_loss *= 0.2
         cls_loss = model["classifer"].get_loss(recon, multi_hot)
-        loss = recon_loss+0.2*contra_loss+cls_loss
+        loss = 0.1*recon_loss+0.1*contra_loss+cls_loss
 
         sum_recon_loss += recon_loss.item()
         sum_contra_loss += contra_loss.item()
@@ -63,10 +67,10 @@ def train_loop():
 def test():
     for v in model.values():
         v.eval()
-    test_loader = DataLoader(test_set, batch_size=32,
+    test_loader = DataLoader(test_set, batch_size=64,
                              shuffle=False, drop_last=True)
     batches = 0
-    sum_p1, sum_p3 = 0.0, 0.0
+    sum_p1, sum_p3, sum_p5 = 0.0, 0.0, 0.0
     with torch.no_grad():
         for x in test_loader:
             pmid, text, multi_hot = x
@@ -76,11 +80,12 @@ def test():
             logits = model["classifer"](recon)  # [B x C]
             sum_p1 += topk_precision(logits, multi_hot, k=1)
             sum_p3 += topk_precision(logits, multi_hot, k=3)
+            sum_p5 += topk_precision(logits, multi_hot, k=5)
             batches += 1
-    return sum_p1/batches, sum_p3/batches
+    return sum_p1/batches, sum_p3/batches, sum_p5/batches
 
 
-bar = tqdm(range(100))
+bar = tqdm(range(400))
 for epoch in bar:
     recon_loss, contra_loss, cls_loss = train_loop()
     loss = recon_loss+contra_loss+cls_loss
@@ -88,9 +93,10 @@ for epoch in bar:
     writer.add_scalar("recon_loss", recon_loss, epoch)
     writer.add_scalar("contra_loss", contra_loss, epoch)
     writer.add_scalar("cls_loss", cls_loss, epoch)
-    p1, p3 = test()
+    p1, p3, p5 = test()
     writer.add_scalar("p1", p1, epoch)
     writer.add_scalar("p3", p3, epoch)
+    writer.add_scalar("p5", p5, epoch)
     if (epoch+1)%20==0:
         writer.save_ckpt(model, epoch)
-    bar.set_description(f"loss: {loss:.4f}, p@1:{p1:.4f}, p@3: {p3:.4f}")
+    bar.set_description(f"loss: {loss:.4f}, p@1:{p1:.4f}, p@3: {p3:.4f}, p@5: {p5:.4f}")

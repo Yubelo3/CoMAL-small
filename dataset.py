@@ -7,7 +7,7 @@ import torch
 def load_dataset(csv_path: str = "data/PubMed/pm.csv",
                  train_ratio=0.8,
                  initial_train_size=100,
-                 test_size=100
+                 test_size=300,
                  ):
     full_data = pd.read_csv(csv_path)
     sample_count = len(full_data)
@@ -39,6 +39,7 @@ class PubMedDataset(Dataset):
         row = self.full_data.iloc[self.indices[index]]
         pmid, title, abstract = row[["pmid", "Title", "abstractText"]]
         multi_hot = row.iloc[-14:].tolist()
+        title=str(title)
         text = title+abstract
         return [pmid, text, torch.Tensor(multi_hot)]
 
