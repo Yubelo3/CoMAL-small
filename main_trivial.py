@@ -76,7 +76,7 @@ def test():
     return sum_p1/batches, sum_p3/batches, sum_p5/batches
 
 
-bar = tqdm(range(300))
+bar = tqdm(range(100))
 for epoch in bar:
     loss = train_loop()
     writer.add_scalar("loss", loss, epoch)

@@ -9,6 +9,6 @@
 
 #SBATCH --gres=gpu:1
 #SBATCH --time=24:00:00
-#SBATCH --partition=gpu-a30  # intel, amd or gpu-a30
+#SBATCH --partition=normal  # intel, amd or gpu-a30
 
-python main_contrastive.py
+python main_active.py

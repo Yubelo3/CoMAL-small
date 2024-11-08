@@ -13,6 +13,7 @@ class AutoEncoder(nn.Module):
                  ) -> None:
         super().__init__()
         self.h_dim = hidden_dim
+        self.sub_dim=sub_dim
         self.n_classes = num_classes
         # cluster sample count
         self.register_buffer("count", torch.zeros(
@@ -38,12 +39,18 @@ class AutoEncoder(nn.Module):
         self.contrastive_loss = SupConLoss()
         self.reconstruction_loss = nn.MSELoss()
 
-    def forward(self, x: torch.Tensor):
-        # x: [B x in_dim], text embedding
+    def get_sub_rep(self, x:torch.Tensor):
+        # x: [B x in_dim]
         B = x.shape[0]
         y: torch.Tensor = self.fc0(x).view(B, self.n_classes, self.h_dim)
         sub_rep = self.fc1(y)  # [B x C x sub_dim]
         sub_rep = F.normalize(sub_rep, dim=-1)
+        return sub_rep
+
+    def forward(self, x: torch.Tensor):
+        # x: [B x in_dim], text embedding
+        B = x.shape[0]
+        sub_rep = self.get_sub_rep(x)
         recon = self.fc2(sub_rep.view(B, -1))
 
         return sub_rep, recon
@@ -52,9 +59,7 @@ class AutoEncoder(nn.Module):
         # x: [B x in_dim], text embedding
         # multi_hot: [B x C], text multi label vector
         B = x.shape[0]
-        y: torch.Tensor = self.fc0(x).view(B, self.n_classes, self.h_dim)
-        sub_rep = self.fc1(y)  # [B x C x sub_dim]
-        sub_rep = F.normalize(sub_rep, dim=-1)
+        sub_rep=self.get_sub_rep(x)
         multi_hot = multi_hot.view(B, self.n_classes, 1)
         agg_feat = (sub_rep*multi_hot).sum(dim=0)  # [C x sub_dim]
         agg_neg_feat = (sub_rep*(1-multi_hot)
