@@ -1,0 +1,13 @@
+name: comal
+channels:
+  - pytorch
+  - defaults
+dependencies:
+  - python=3.11
+  - pytorch=2.5.1
+  - pytorch-cuda=12.4
+  - scikit-learn=1.5.1
+  - scipy=1.12.0
+  - tensorboard=2.17
+  - pip:
+      - transformers==4.46.1
