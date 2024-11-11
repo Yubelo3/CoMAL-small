@@ -3,15 +3,15 @@
 ## Introduction  
 
 This is a trivial reproduction of the paper [CoMAL: Contrastive Active Learning for Multi-Label Text
-Classification](https://markdown.com.cn) on [PubMed dataset](https://huggingface.co/datasets/owaiskha9654/PubMed_MultiLabel_Text_Classification_Dataset_MeSH).   
+Classification](https://dl.acm.org/doi/10.1145/3637528.3671754) on [PubMed dataset](https://linqs.org/datasets/#pubmed-diabetes).   
 
 This repository is served as part of our course project and is NOT intended for use in formal research.  
 
-There are already [official implementation](https://github.com/chengzju/CoMAL) for this paper. Please take that as first choice.  
+There is already an [official implementation](https://github.com/chengzju/CoMAL) for this paper. Please take that as first choice.  
 
 
 ## Results  
-If you just wants to check the result of the course projects, you can ignore the rest part of this readme, prepare an environment with tensorboard installed and find our related logs at `result_logs/`.  
+If you just want to check the result of the course project, you can ignore the rest part of this readme, prepare an environment with tensorboard installed and use it to see our related logs at `result_logs/`.  
 For example, run:  
 ```bash
 tensorboard --logdir=result_logs/official_code_on_rcv1 --port=2024
@@ -28,7 +28,7 @@ If you are using pytorch 1.x, please comment all the lines with `torch.complie`.
 
 ## Data preperation  
 
-* Download the [PubMed dataset](https://huggingface.co/datasets/owaiskha9654/PubMed_MultiLabel_Text_Classification_Dataset_MeSH), name the csv file `pm.csv` and put it under `data/PubMed/pm.csv`.  
+* Download the [preprocessed version of PubMed dataset](https://huggingface.co/datasets/owaiskha9654/PubMed_MultiLabel_Text_Classification_Dataset_MeSH), name the csv file `pm.csv` and put it under `data/PubMed/pm.csv`.  
 
 * The csv file is already a preprocessed version and our code for dataset can handle some exceptions, so there is no need for extra data preprocessing.  
 

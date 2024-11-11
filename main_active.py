@@ -1,10 +1,10 @@
 from logger import TBWriter
 from metric import topk_precision
 from tqdm import tqdm
-from auto_encoder import AutoEncoder
-from classifier import MLPClassifier
+from models.auto_encoder import AutoEncoder
+from models.classifier import MLPClassifier
 from torch.utils.data import DataLoader
-from text_encoder import BertEncoder
+from models.text_encoder import BertEncoder
 from dataset import load_dataset, active_sample_selection, fake_active_sample_selection
 import random
 import torch

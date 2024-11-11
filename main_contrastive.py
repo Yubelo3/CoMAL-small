@@ -1,18 +1,17 @@
-import random 
+from logger import TBWriter
+from metric import topk_precision
+from tqdm import tqdm
+from models.auto_encoder import AutoEncoder
+from models.classifier import MLPClassifier
+from torch.utils.data import DataLoader
+from models.text_encoder import BertEncoder
+from dataset import load_dataset
+import random
 import torch
 import numpy
 random.seed(2024)
 torch.manual_seed(2024)
 numpy.random.seed(2024)
-from dataset import load_dataset
-from text_encoder import BertEncoder
-from torch.utils.data import DataLoader
-from classifier import MLPClassifier
-from auto_encoder import AutoEncoder
-from tqdm import tqdm
-import torch
-from metric import topk_precision
-from logger import TBWriter
 
 device = "cuda"
 
@@ -97,6 +96,7 @@ for epoch in bar:
     writer.add_scalar("p1", p1, epoch)
     writer.add_scalar("p3", p3, epoch)
     writer.add_scalar("p5", p5, epoch)
-    if (epoch+1)%20==0:
+    if (epoch+1) % 20 == 0:
         writer.save_ckpt(model, epoch)
-    bar.set_description(f"loss: {loss:.4f}, p@1:{p1:.4f}, p@3: {p3:.4f}, p@5: {p5:.4f}")
+    bar.set_description(
+        f"loss: {loss:.4f}, p@1:{p1:.4f}, p@3: {p3:.4f}, p@5: {p5:.4f}")
